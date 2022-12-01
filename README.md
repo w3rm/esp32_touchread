@@ -1,7 +1,50 @@
 # esp32_touchread
-ESP32 lib to control intermittence when reading touch button state
+ESP32 lib to control intermittence when reading touch button state.
+Tested with ESP-WROOM-32D
 
 # Usage
+```c++
+//include touch lib
+#include "touch_button.h"
+//global vars
+#define TOUCH_BUTTON_PIN 12 //GPIO pin
+#define TOUCH_DEBOUNCE_THERESHOLD_INMILLIS 150  //you should adjust it for the best that addapt in your project, 150 worked fine for our project
+
+//class initialization
+TouchButton touchButton(TOUCH_BUTTON_PIN);
+
+//we should call this methodo to handle bounce intermittence of touch sensor
+touchButton.handleState(TOUCH_DEBOUNCE_THERESHOLD_INMILLIS);
+
+//if you want to use boolean - touch button is pressed
+if (touchButton.isPressed()) {
+  //do some magic
+}
+
+//if you want to use boolean - touch button is released
+if (!touchButton.isPressed()) {
+  //do some magic
+}
+
+//if you want to use enum - touch button is pressed
+if (touchButton.getCurrentState() == TOUCH_STATE::PRESSED) {
+  //do some magic
+}
+
+//if you want to use enum - touch button is released
+if (touchButton.getCurrentState() == TOUCH_STATE::RELEASED{
+  //do some magic
+}
+
+//if you want to use like and int - 0 is released | 1 is pressed
+if (static_cast<uint32_t>(touchButton.getCurrentState()) == 1){
+  //do some magic
+}
+
+
+```
+
+# Demo
 ```c++
 #include "touch_button.h"
 
