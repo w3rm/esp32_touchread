@@ -1,5 +1,5 @@
 #include "esp32-hal-touch.h"
-enum class TOUCH_STATE {
+enum class TOUCH_STATE : byte {
   RELEASED = 0,
   PRESSED = 1
 };
@@ -9,12 +9,16 @@ private:
   TOUCH_STATE currentEvent = TOUCH_STATE::RELEASED;
   TOUCH_STATE currentState = TOUCH_STATE::RELEASED;
   unsigned long lastChangedStateTime = 0;
+  unsigned short touchThresholdSensibility;
+  unsigned short debounceThresholdInMillis;  
 public:
-  TouchButton(byte pin) {
+  TouchButton(byte pin, unsigned short touchThresholdSensibility, unsigned short debounceThresholdInMillis) {
     this->pin = pin;
+    this->touchThresholdSensibility = touchThresholdSensibility;
+    this->debounceThresholdInMillis = debounceThresholdInMillis;    
   }
-  void handleState(unsigned int debounceThreshold = 100) {
-    if (touchRead(pin) < 40) {
+  void handleState() {
+    if (touchRead(pin) < touchThresholdSensibility) {
       currentEvent = TOUCH_STATE::PRESSED;
     } else {
       currentEvent = TOUCH_STATE::RELEASED;
@@ -23,8 +27,8 @@ public:
     if (currentEvent == TOUCH_STATE::PRESSED && currentState == TOUCH_STATE::RELEASED) {
       currentState = TOUCH_STATE::PRESSED;
       lastChangedStateTime = millis();
-    }else if (currentEvent != currentState) {
-      if (millis() - lastChangedStateTime > debounceThreshold) {
+    } else if (currentEvent != currentState) {
+      if (millis() - lastChangedStateTime > debounceThresholdInMillis) {
         currentState = currentEvent;
         lastChangedStateTime = millis();
       }
